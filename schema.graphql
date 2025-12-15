@@ -2,7 +2,7 @@
 # Core entities
 ####
 
-type Protocol @entity {
+type Protocol @entity (immutable: false) {
     "Configurator proxy address"
     id: Bytes!
 
@@ -37,7 +37,7 @@ type Protocol @entity {
     weeklyProtocolAccounting: [WeeklyProtocolAccounting!]! @derivedFrom(field: "protocol")
 }
 
-type Market @entity(immutable: true) {
+type Market @entity (immutable: false) {
     "Comet proxy address"
     id: Bytes!
     "Comet proxy address"
@@ -102,7 +102,7 @@ type Market @entity(immutable: true) {
     weeklyMarketAccounting: [WeeklyMarketAccounting!]! @derivedFrom(field: "market")
 }
 
-type Position @entity(immutable: true) {
+type Position @entity (immutable: false) {
     "Market proxy address + owner address"
     id: Bytes!
     "Block number the position was created"
@@ -153,7 +153,7 @@ type Position @entity(immutable: true) {
 # Configuration
 ####
 
-type MarketConfiguration @entity {
+type MarketConfiguration @entity (immutable: false) {
     "Market proxy address or block number + log index for snapshots"
     id: Bytes!
     "Market to configuration is for"
@@ -217,7 +217,7 @@ type MarketConfiguration @entity {
     collateralTokens: [CollateralToken!]!
 }
 
-type MarketRewardConfiguration @entity {
+type MarketRewardConfiguration @entity (immutable: false) {
     "Market id + reward token address"
     id: Bytes!
 
@@ -231,7 +231,7 @@ type MarketRewardConfiguration @entity {
 # Accounting
 ####
 
-type ProtocolAccounting @entity {
+type ProtocolAccounting @entity (immutable: false) {
     "Protocol ID + hour number for snapshots"
     id: Bytes!
 
@@ -273,7 +273,7 @@ type ProtocolAccounting @entity {
     avgNetBorrowApr: BigDecimal!
 }
 
-type MarketAccounting @entity {
+type MarketAccounting @entity (immutable: false) {
     "Market ID + hour number for snapshots"
     id: Bytes!
     "Market the accounting is for"
@@ -344,7 +344,7 @@ type MarketAccounting @entity {
     rewardTokenUsdPrice: BigDecimal! 
 }
 
-type PositionAccounting @entity {
+type PositionAccounting @entity (immutable: false) {
     "Position ID or block timestamp + log index for snapshots"
     id: Bytes!
 
@@ -399,7 +399,7 @@ type PositionAccounting @entity {
 # Usage
 ####
 
-type Usage @entity {
+type Usage @entity (immutable: false) {
     "Name + time qualifier (ex: PROTOCOL_HOUR + hour)"
     id: Bytes!
 
@@ -430,7 +430,7 @@ type Usage @entity {
 # Historical Snapshots
 ####
 
-type HourlyProtocolAccounting @entity {
+type HourlyProtocolAccounting @entity (immutable: false) {
     "Hour"
     id: Bytes!
     "Hours since unix epoch"
@@ -443,7 +443,7 @@ type HourlyProtocolAccounting @entity {
     accounting: ProtocolAccounting!
 }
 
-type DailyProtocolAccounting @entity {
+type DailyProtocolAccounting @entity (immutable: false) {
     "Day"
     id: Bytes!
     "Days since unix epoch"
@@ -456,7 +456,7 @@ type DailyProtocolAccounting @entity {
     accounting: ProtocolAccounting!
 }
 
-type WeeklyProtocolAccounting @entity {
+type WeeklyProtocolAccounting @entity (immutable: false) {
     "Week"
     id: Bytes!
     "Week since unix epoch"
@@ -469,7 +469,7 @@ type WeeklyProtocolAccounting @entity {
     accounting: ProtocolAccounting!
 }
 
-type MarketConfigurationSnapshot @entity {
+type MarketConfigurationSnapshot @entity (immutable: false) {
     "Block number + log index. Note config snapshots are only taken when config changes, not periodically"
     id: Bytes!
     "Timestamp in seconds since unix epoch"
@@ -480,7 +480,7 @@ type MarketConfigurationSnapshot @entity {
     configuration: MarketConfiguration!
 }
 
-type HourlyMarketAccounting @entity {
+type HourlyMarketAccounting @entity (immutable: false) {
     "Market ID + hour"
     id: Bytes!
     "Hours since unix epoch"
@@ -493,7 +493,7 @@ type HourlyMarketAccounting @entity {
     accounting: MarketAccounting!
 }
 
-type DailyMarketAccounting @entity {
+type DailyMarketAccounting @entity (immutable: false) {
     "Market ID + day"
     id: Bytes!
     "Days since unix epoch"
@@ -506,7 +506,7 @@ type DailyMarketAccounting @entity {
     accounting: MarketAccounting!
 }
 
-type WeeklyMarketAccounting @entity {
+type WeeklyMarketAccounting @entity (immutable: false) {
     "Market ID + week"
     id: Bytes!
     "Weeks since unix epoch"
@@ -519,7 +519,7 @@ type WeeklyMarketAccounting @entity {
     accounting: MarketAccounting!
 }
 
-type PositionAccountingSnapshot @entity {
+type PositionAccountingSnapshot @entity (immutable: false) {
     "Position ID + block number + log index. Note that position snapshots are only taken when the position changes (supply, borrow, liquidate, etc.), not periodically"
     id: Bytes!
     "Timestamp in seconds since unix epoch"
@@ -530,7 +530,7 @@ type PositionAccountingSnapshot @entity {
     accounting: PositionAccounting!
 }
 
-type ProtocolHourlyUsage @entity {
+type ProtocolHourlyUsage @entity (immutable: false) {
     "Hour"
     id: Bytes!
     "Hours since unix epoch"
@@ -543,7 +543,7 @@ type ProtocolHourlyUsage @entity {
     usage: Usage!
 }
 
-type ProtocolDailyUsage @entity {
+type ProtocolDailyUsage @entity (immutable: false) {
     "Day"
     id: Bytes!
     "Days since unix epoch"
@@ -556,7 +556,7 @@ type ProtocolDailyUsage @entity {
     usage: Usage!
 }
 
-type MarketHourlyUsage @entity {
+type MarketHourlyUsage @entity (immutable: false) {
     "Market ID + hour"
     id: Bytes!
     "Hours since unix epoch"
@@ -569,7 +569,7 @@ type MarketHourlyUsage @entity {
     usage: Usage!
 }
 
-type MarketDailyUsage @entity {
+type MarketDailyUsage @entity (immutable: false) {
     "Market ID + day"
     id: Bytes!
     "Days since unix epoch"
@@ -586,7 +586,7 @@ type MarketDailyUsage @entity {
 # Tokens
 ####
 
-type Token @entity {
+type Token @entity (immutable: false) {
     "Token address"
     id: Bytes!
     "Token address"
@@ -604,7 +604,7 @@ type Token @entity {
     lastPriceBlockNumber: BigInt!
 }
 
-type BaseToken @entity {
+type BaseToken @entity (immutable: false) {
     "market ID + token ID"
     id: Bytes!
 
@@ -626,7 +626,7 @@ type BaseToken @entity {
     lastPriceBlockNumber: BigInt!
 }
 
-type CollateralToken @entity {
+type CollateralToken @entity (immutable: false) {
     "Market ID + token ID + 'Col'"
     id: Bytes!
 
@@ -669,7 +669,7 @@ interface CollateralBalance {
     balance: BigInt!
 }
 
-type MarketCollateralBalance implements CollateralBalance @entity {
+type MarketCollateralBalance implements CollateralBalance @entity (immutable: false) {
     "Collateral token ID + 'BAL'"
     id: Bytes!
     "Block number when this balance was created"
@@ -692,7 +692,7 @@ type MarketCollateralBalance implements CollateralBalance @entity {
     reservesUsd: BigDecimal!
 }
 
-type PositionCollateralBalance implements CollateralBalance @entity {
+type PositionCollateralBalance implements CollateralBalance @entity (immutable: false) {
     "Position id + collateral token ID"
     id: Bytes!
     "Block number the position collateral balance was created"
@@ -714,7 +714,7 @@ type PositionCollateralBalance implements CollateralBalance @entity {
 # Account
 ####
 
-type Account @entity {
+type Account @entity (immutable: false) {
     "Address"
     id: Bytes!
 
@@ -730,9 +730,15 @@ type Account @entity {
     positions: [Position!]! @derivedFrom(field: "account")
     "All reward claim interactions of the account. Note that this includes all rewards claimed, where the positions may miss rewards claimed due to missing events"
     rewardsClaimedInteractions: [ClaimRewardsInteraction!]! @derivedFrom(field: "account")
+
+    ####
+    # Custom
+    ####
+    "Base borrow balance of the account"
+    baseBorrowBalance: BigDecimal!
 }
 
-type _ActiveAccount @entity {
+type _ActiveAccount @entity (immutable: false) {
     "Address + usecase specific metadata, this is just a helper for tracking overall usage"
     id: Bytes!
 }
@@ -741,7 +747,7 @@ type _ActiveAccount @entity {
 # Interactions
 ####
 
-type Transaction @entity(immutable: true) {
+type Transaction @entity (immutable: false) {
     "Transaction hash"
     id: Bytes!
     "Transaction hash"
@@ -805,7 +811,7 @@ type Transaction @entity(immutable: true) {
     claimRewardsInteractions: [ClaimRewardsInteraction!]! @derivedFrom(field: "transaction")
 }
 
-type SupplyBaseInteraction @entity(immutable: true) {
+type SupplyBaseInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -826,7 +832,7 @@ type SupplyBaseInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type WithdrawBaseInteraction @entity(immutable: true) {
+type WithdrawBaseInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -847,7 +853,7 @@ type WithdrawBaseInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type TransferBaseInteraction @entity(immutable: true) {
+type TransferBaseInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -868,7 +874,7 @@ type TransferBaseInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type AbsorbDebtInteraction @entity(immutable: true) {
+type AbsorbDebtInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -889,7 +895,7 @@ type AbsorbDebtInteraction @entity(immutable: true) {
     amountUsd: BigDecimal! 
 }
 
-type SupplyCollateralInteraction @entity(immutable: true) {
+type SupplyCollateralInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -910,7 +916,7 @@ type SupplyCollateralInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type WithdrawCollateralInteraction @entity(immutable: true) {
+type WithdrawCollateralInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -931,7 +937,7 @@ type WithdrawCollateralInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type TransferCollateralInteraction @entity(immutable: true) {
+type TransferCollateralInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -952,7 +958,7 @@ type TransferCollateralInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type AbsorbCollateralInteraction @entity(immutable: true) {
+type AbsorbCollateralInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -973,7 +979,7 @@ type AbsorbCollateralInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type BuyCollateralInteraction @entity(immutable: true) {
+type BuyCollateralInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -996,7 +1002,7 @@ type BuyCollateralInteraction @entity(immutable: true) {
     baseAmountUsd: BigDecimal!
 }
 
-type WithdrawReservesInteraction @entity(immutable: true) {
+type WithdrawReservesInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"
@@ -1013,7 +1019,7 @@ type WithdrawReservesInteraction @entity(immutable: true) {
     amountUsd: BigDecimal!
 }
 
-type ClaimRewardsInteraction @entity(immutable: true) {
+type ClaimRewardsInteraction @entity (immutable: false) {
     "Transaction ID + event log index"
     id: Bytes!
     "Transaction this interaction is part of"

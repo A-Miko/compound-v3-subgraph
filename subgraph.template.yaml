@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Configurator
-    network: base-sepolia
+    network: {{ network }}
     source:
       abi: Configurator
-      address: "0x090a2b1fc84d0b5141d5D5608b12Db19201aE5a6"
-      startBlock: 7646652
+      address: "{{ Configurator.address }}"
+      startBlock: {{ Configurator.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -27,11 +27,11 @@ dataSources:
       file: ./src/mappings/configurator.ts
   - kind: ethereum
     name: CometRewards
-    network: base-sepolia
+    network: {{ network }}
     source:
       abi: CometRewardsV2
-      address: "0x3394fa1baCC0b47dd0fF28C8573a476a161aF7BC"
-      startBlock: 7646657
+      address: "{{ CometRewards.address }}"
+      startBlock: {{ CometRewards.startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -58,7 +58,7 @@ dataSources:
 templates:
   - kind: ethereum
     name: Comet
-    network: base-sepolia
+    network: {{ network }}
     source:
       abi: Comet
     mapping:
@@ -95,16 +95,13 @@ templates:
         - event: SupplyCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleSupplyCollateral
           receipt: true
-        - event: WithdrawCollateral(indexed address,indexed address,indexed
-            address,uint256)
+        - event: WithdrawCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
           receipt: true
-        - event: TransferCollateral(indexed address,indexed address,indexed
-            address,uint256)
+        - event: TransferCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleTransferCollateral
           receipt: true
-        - event: AbsorbCollateral(indexed address,indexed address,indexed
-            address,uint256,uint256)
+        - event: AbsorbCollateral(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleAbsorbCollateral
           receipt: true
         - event: BuyCollateral(indexed address,indexed address,uint256,uint256)

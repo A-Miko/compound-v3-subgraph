@@ -48,6 +48,7 @@ import { InteractionType, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../common/const
 import { updateUsageMetrics } from "../mappingHelpers/usage";
 import { bigIntMax, bigIntMin, logsContainWithdrawOrSupplyOrAbsorbDebtEvents, presentValue } from "../common/utils";
 import { BaseToken, Transaction } from "../../generated/schema";
+import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function handleUpgraded(event: UpgradedEvent): void {
     // Create market if not yet made
@@ -90,6 +91,23 @@ export function handleSupply(event: SupplyEvent): void {
     updateUsageMetrics(account, market, InteractionType.SUPPLY_BASE, event);
 
     marketAccounting.save();
+
+    const principal = positionAccounting.basePrincipal;
+    if (principal.lt(ZERO_BI)) {
+        // User is in debt. Calculate how much.
+        // Formula: |principal| * baseBorrowIndex / 1e15
+        // Note: We use .neg() to make principal positive for the calculation
+        const rawDebt = presentValue(principal.neg(), marketAccounting.baseBorrowIndex);
+        
+        // 3. Convert to BigDecimal (USDC has 6 decimals)
+        // Ensure you use the correct decimals for the base token (usually 6 for USDC)
+        account.baseBorrowBalance = toDecimal(rawDebt, 6); 
+    } else {
+        // User has positive supply, so debt is 0
+        account.baseBorrowBalance = ZERO_BD;
+    }
+    
+    account.save();
 }
 
 export function handleWithdraw(event: WithdrawEvent): void {
@@ -120,6 +138,19 @@ export function handleWithdraw(event: WithdrawEvent): void {
     updateUsageMetrics(account, market, InteractionType.WITHDRAW_BASE, event);
 
     marketAccounting.save();
+
+    const principal = positionAccounting.basePrincipal;
+
+    if (principal.lt(ZERO_BI)) {
+        // User is in debt (principal is negative)
+        const rawDebt = presentValue(principal.neg(), marketAccounting.baseBorrowIndex);
+        account.baseBorrowBalance = toDecimal(rawDebt, 6); // Assuming 6 decimals for Base Token (USDC)
+    } else {
+        // User is supplying (principal is positive)
+        account.baseBorrowBalance = ZERO_BD;
+    }
+    
+    account.save();
 }
 
 export function handleAbsorbDebt(event: AbsorbDebtEvent): void {
@@ -143,6 +174,19 @@ export function handleAbsorbDebt(event: AbsorbDebtEvent): void {
 
     marketAccounting.save();
     positionAccounting.save();
+
+    const principal = positionAccounting.basePrincipal;
+
+    if (principal.lt(ZERO_BI)) {
+        // User is still in debt? Update the value.
+        const rawDebt = presentValue(principal.neg(), marketAccounting.baseBorrowIndex);
+        account.baseBorrowBalance = toDecimal(rawDebt, 6); // Assuming 6 decimals for Base Token (USDC)
+    } else {
+        // Debt fully absorbed/paid off? Balance is 0.
+        account.baseBorrowBalance = ZERO_BD;
+    }
+
+    account.save();
 }
 
 export function handleSupplyCollateral(event: SupplyCollateralEvent): void {
@@ -379,6 +423,15 @@ export function handleTransfer(event: TransferEvent): void {
         createPositionAccountingSnapshot(fromPositionAccounting, event); // Manually retrigger snapshot
 
         updateUsageMetrics(fromAccount, market, InteractionType.TRANSFER_BASE, event);
+
+        const fromPrincipal = fromPositionAccounting.basePrincipal;
+        if (fromPrincipal.lt(ZERO_BI)) {
+            const rawDebt = presentValue(fromPrincipal.neg(), marketAccounting.baseBorrowIndex);
+            fromAccount.baseBorrowBalance = toDecimal(rawDebt, 6);
+        } else {
+            fromAccount.baseBorrowBalance = ZERO_BD;
+        }
+        fromAccount.save();
     } else {
         // Transfer to
         const toAccount = getOrCreateAccount(transferToAddress, event);
@@ -406,8 +459,22 @@ export function handleTransfer(event: TransferEvent): void {
         createPositionAccountingSnapshot(toPositionAccounting, event); // Manually retrigger snapshot
 
         updateUsageMetrics(toAccount, market, InteractionType.TRANSFER_BASE, event);
+
+        const toPrincipal = toPositionAccounting.basePrincipal;
+        if (toPrincipal.lt(ZERO_BI)) {
+            const rawDebt = presentValue(toPrincipal.neg(), marketAccounting.baseBorrowIndex);
+            toAccount.baseBorrowBalance = toDecimal(rawDebt, 6);
+        } else {
+            toAccount.baseBorrowBalance = ZERO_BD;
+        }
+        toAccount.save();
     }
 
 
     marketAccounting.save();
+}
+
+function toDecimal(value: BigInt, decimals: number): BigDecimal {
+  let precision = BigInt.fromI32(10).pow(decimals as u8).toBigDecimal();
+  return value.toBigDecimal().div(precision);
 }

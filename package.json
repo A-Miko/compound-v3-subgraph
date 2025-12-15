@@ -30,7 +30,10 @@
     "create-local": "source .env; graph create --node http://${LOCAL_NODE_IP}:8020/ papercliplabs/compound-v3-local",
     "remove-local": "source .env; graph remove --node http://${LOCAL_NODE_IP}:8020/ papercliplabs/compound-v3-local",
     "deploy-local": "source .env; graph deploy --node http://${LOCAL_NODE_IP}:8020/ --ipfs http://${LOCAL_NODE_IP}:5001 papercliplabs/compound-v3-local --output-dir=build/mainnet --version-label v0",
-    "test": "graph test"
+    "test": "graph test",
+    "prepare:base-sepolia": "node build-yaml.js base-sepolia",
+    "build": "graph build",
+    "deploy:base-sepolia": "npm run prepare:base-sepolia && npm run codegen && graph build --network base-sepolia && graph deploy --studio compound-v3-base-sepolia"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.70.0",
@@ -39,6 +42,7 @@
   "devDependencies": {
     "@types/node": "^20.8.3",
     "matchstick-as": "0.5.0",
+    "mustache": "^4.2.0",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.1",
     "tslib": "^2.6.2",

@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Account } from "../../generated/schema";
 
 export function getOrCreateAccount(address: Address, event: ethereum.Event): Account {
@@ -9,6 +9,7 @@ export function getOrCreateAccount(address: Address, event: ethereum.Event): Acc
 
         account.creationBlockNumber = event.block.number;
         account.address = address;
+        account.baseBorrowBalance = BigDecimal.zero();
 
         account.save();
     }
